@@ -1,5 +1,12 @@
 # AnalyticsProject
-MODEL 1:
+
+Title: Dynamic Pricing for Urban Parking Lots
+
+Organization: Capstone Project, Summer Analytics 2025 (CnA × Pathway)
+
+This project builds a real-time dynamic pricing system for urban parking lots using live data and demand signals such as occupancy, traffic level, queue length, and vehicle type. Implemented entirely with Python, Pandas, Numpy, and Pathway, the system predicts parking prices for 14 lots over 73 days in real time.
+
+**MODEL 1**:
 Baseline Linear Model
 Pricing Formula
 In this simple model, the price at the next time step is linearly dependent on the current occupancy level relative to capacity:
@@ -9,19 +16,19 @@ Where:
 Initial Price₀ = $10
 Prices are bounded between $5 and $20 for realism.
 
-Rationale
+*Rationale*
 1)Higher occupancy → higher prices: encourages turnover and optimizes revenue.
 2)Lower occupancy → lower prices: attracts more customers when space is underutilized.
 3)This basic model ignores traffic, queue length, or vehicle type — it only reacts to how full the parking lot is.
 
-Assumptions
+*Assumptions*
 1)Occupancy is the only factor influencing price.
 
 2)Parking price updates occur at each time step (~30 min intervals).
 
 3)External factors like traffic or special events are not considered here.
 
-Limitations
+*Limitations*
 1)Ignores other demand influencers (queue length, vehicle size, special days).
 
 2)May cause price jumps if occupancy fluctuates rapidly.
@@ -31,7 +38,7 @@ Limitations
 Example Behavior
 For alpha = 2, occupancy = 10, capacity = 20, price = 11USD
 
-MODEL2:
+**MODEL2**:
 Demand Function Design
 To dynamically adjust the parking price, we modeled demand as a weighted combination of key real-time features:
 
@@ -47,7 +54,7 @@ Where:
 
 5)VehicleTypeWeight: Larger vehicles (e.g., trucks) use more space
 
-Pricing Logic
+*Pricing Logic*
 We adjusted prices based on the computed demand:
 
 Price at time t = BasePrice⋅(1+𝜆⋅NormalizedDemand)
@@ -67,7 +74,7 @@ This ensured prices:
 
 2)Remain stable and avoid erratic jumps
 
-Assumptions Made
+*Assumptions Made*
 
 1)Queue length reflects unmet demand and willingness to pay more.
 
@@ -86,5 +93,69 @@ Example Outcome
 As occupancy and queue length grow, prices gradually increase from $10 to a max of $20. If traffic is high or it's a normal weekday, prices may decrease. The system thus adapts to real-time conditions in a realistic, explainable manner.
 The final bokeh graph post model 2 looks like this:
 ![bokeh_plot](https://github.com/user-attachments/assets/b4ba0ce4-a919-4019-b235-197c15dd1a35)
+
+**Tech Stack**
+
+| Layer                    | Technology                                                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Language**             | Python 3.11                                                                                                    |
+| **Libraries**            | Numpy, Pandas, Scikit-learn (for offline model), Pathway (for real-time simulation), Bokeh (for visualization) |
+| **Streaming Engine**     | Pathway                                                                                                        |
+| **Development Platform** | Google Colab                                                                                                   |
+| **Visualization**        | Bokeh                                                                                                          |
+| **Version Control**      | Git & GitHub                                                                                                   |
+
+**Architecture Overview**
+1. Offline Training (Model 2)
+
+Load dataset.csv using Pandas
+
+Engineer demand-relevant features
+
+Train ML model (e.g., Random Forest) to predict prices
+
+Save model (e.g., using joblib or pickle)
+
+2. Real-Time Simulation using Pathway
+   
+Stream dataset.csv with timestamps using pw.io.csv.read
+
+Perform real-time feature engineering (vehicle type, traffic encoding, etc.)
+
+Use pre-trained ML model (or simple formula for Model 1) to predict live prices
+
+Output prediction using pw.io.jsonlines.write
+
+3. Visualization
+
+Live line plots for each parking lot using Bokeh
+
+Compare with competitor prices and base price
+
+**Architechture Flow Diagram**
+
+            +----------------+
+            |  dataset.csv   |
+            +--------+-------+
+                     |
+                     v
+           [ Pathway Streaming Engine ]
+                     |
+        +------------+------------+
+        |                         |
+        v                         v
+[ Feature Engineering ]     [ Pre-trained ML Model ]
+        |                         |
+        +------------+------------+
+                     |
+                     v
+          [ Price Prediction Table ]
+                     |
+                     v
+         [ Write to predicted_prices.jsonl ]
+                     |
+                     v
+            [ Visualize with Bokeh ]
+            
 
 
