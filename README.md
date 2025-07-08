@@ -132,6 +132,28 @@ Live line plots for each parking lot using Bokeh
 
 Compare with competitor prices and base price
 
+**Architechture Flow: Mermaid Diagram**:
+
+flowchart TD
+    A[dataset.csv] --> B[Pathway Streaming Engine]
+
+    B --> C[Feature Engineering in Real Time]
+    C --> D[Model 1: Linear Pricing]
+    C --> E[Model 2: Demand-Based Pricing]
+
+    D --> F[Price Prediction Table]
+    E --> F
+
+    F --> G[predicted_prices.jsonl]
+    G --> H[Real-Time Bokeh Visualization]
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style C fill:#ddf,stroke:#333,stroke-width:2px
+    style D fill:#afa,stroke:#333,stroke-width:2px
+    style E fill:#afa,strok
+
+
 **Architechture Flow Diagram**
 
             +----------------+
